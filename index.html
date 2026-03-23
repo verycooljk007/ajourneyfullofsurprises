@@ -3,105 +3,855 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Journey Full Of Suprises | Linktree</title>
+    <title>Sonar Link Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --text-color: #ffffff;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-        body, html {
+        * {
             margin: 0;
             padding: 0;
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* Replace 'background.jpg' with your image filename */
-            background: url('image_22d600.jpg') no-repeat center center fixed;
-            background-size: cover;
+            box-sizing: border-box;
         }
 
-        .container {
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            padding: 40px 20px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
         }
 
-        .profile-pic {
-            width: 100px;
-            height: 100px;
+        /* Sonar Grid Background */
+        .sonar-grid {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vmax;
+            height: 100vmax;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
+        }
+
+        .sonar-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #1e3a5f;
             border-radius: 50%;
-            border: 2px solid var(--glass-border);
-            margin-bottom: 20px;
-            object-fit: cover;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
         }
 
-        h1 {
-            color: var(--text-color);
+        .sonar-ring:nth-child(1) { width: 20%; height: 20%; }
+        .sonar-ring:nth-child(2) { width: 40%; height: 40%; }
+        .sonar-ring:nth-child(3) { width: 60%; height: 60%; }
+        .sonar-ring:nth-child(4) { width: 80%; height: 80%; }
+        .sonar-ring:nth-child(5) { width: 100%; height: 100%; }
+
+        /* Crosshairs */
+        .crosshair-h, .crosshair-v {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(30, 58, 95, 0.5), transparent);
+        }
+
+        .crosshair-h {
+            width: 100%;
+            height: 1px;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+
+        .crosshair-v {
+            width: 1px;
+            height: 100%;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, transparent, rgba(30, 58, 95, 0.5), transparent);
+        }
+
+        /* Radar Sweep Animation */
+        .radar-sweep {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 100vmax;
+            height: 100vmax;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        .sweep-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                rgba(0, 212, 255, 0) 0%, 
+                rgba(0, 212, 255, 0.8) 50%, 
+                rgba(0, 212, 255, 1) 100%);
+            transform-origin: 0 50%;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.8);
+            animation: radarSweep 4s linear infinite;
+        }
+
+        @keyframes radarSweep {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Pulse Rings */
+        .pulse-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vmax;
+            height: 100vmax;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(0, 212, 255, 0.6);
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4), inset 0 0 30px rgba(0, 212, 255, 0.2);
+        }
+
+        /* Reactive Pulse Types */
+        .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(0, 212, 255, 0.6);
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4), inset 0 0 30px rgba(0, 212, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* Type 1: Standard Circle */
+        .pulse-ring.type-1 {
+            border-radius: 50%;
+        }
+
+        /* Type 2: Elongated/Ellipse */
+        .pulse-ring.type-2 {
+            border-radius: 50%;
+            height: 60% !important;
+            border-width: 1px;
+            border-style: dashed;
+        }
+
+        /* Type 3: Square with rounded corners */
+        .pulse-ring.type-3 {
+            border-radius: 20%;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        /* Type 4: Double ring */
+        .pulse-ring.type-4 {
+            border-radius: 50%;
+            background: radial-gradient(circle, transparent 60%, rgba(0, 212, 255, 0.1) 60%, rgba(0, 212, 255, 0.3) 70%, transparent 70%);
+            border: none;
+        }
+
+        /* Type 5: Arc/Sweep */
+        .pulse-ring.type-5 {
+            border-radius: 50%;
+            border-top-color: transparent;
+            border-right-color: transparent;
+            border-width: 3px;
+        }
+
+        @keyframes pulseExpand {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 0.4;
+            }
+            100% {
+                width: 150%;
+                height: 150%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulseExpandWide {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.6;
+            }
+            100% {
+                width: 200%;
+                height: 80%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulseExpandSquare {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.7;
+                transform: translate(-50%, -50%) rotate(45deg);
+            }
+            100% {
+                width: 120%;
+                height: 120%;
+                opacity: 0;
+                transform: translate(-50%, -50%) rotate(225deg);
+            }
+        }
+
+        @keyframes pulseArc {
+            0% {
+                width: 50px;
+                height: 50px;
+                opacity: 0.8;
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+                transform: translate(-50%, -50%) rotate(180deg);
+            }
+        }
+
+        /* Active pulse animation classes */
+        .pulse-active-1 {
+            animation: pulseExpand 1.2s ease-out forwards;
+        }
+
+        .pulse-active-2 {
+            animation: pulseExpandWide 1.5s ease-out forwards;
+        }
+
+        .pulse-active-3 {
+            animation: pulseExpandSquare 1.3s ease-out forwards;
+        }
+
+        .pulse-active-4 {
+            animation: pulseExpand 1s ease-out forwards;
+        }
+
+        .pulse-active-5 {
+            animation: pulseArc 1.4s ease-out forwards;
+        }
+
+        /* Content Container */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+
+        .avatar-glow {
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.4) 0%, transparent 70%);
+            animation: avatarPulse 2s ease-in-out infinite;
+        }
+
+        .avatar-ring {
+            position: absolute;
+            inset: -10px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes avatarPulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .username {
+            font-family: 'JetBrains Mono', monospace;
             font-size: 1.5rem;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-weight: 600;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .handle {
+            color: #64748b;
+            font-size: 0.875rem;
+            font-family: 'JetBrains Mono', monospace;
             letter-spacing: 1px;
         }
 
+        /* Status Indicator */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #00d4ff;
+            opacity: 0.8;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00d4ff;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+            box-shadow: 0 0 10px #00d4ff;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Link Buttons */
         .links-container {
+            width: 100%;
+            max-width: 480px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 1rem;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
         }
 
-        .link-card {
-            padding: 15px;
-            text-decoration: none;
-            color: var(--text-color);
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
+        .sonar-btn {
+            position: relative;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.3);
             border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .sonar-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 212, 255, 0.2), 
+                transparent);
+            transition: left 0.5s ease;
+        }
+
+        .sonar-btn:hover::before {
+            left: 100%;
+        }
+
+        .sonar-btn:hover {
+            border-color: rgba(0, 212, 255, 0.8);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            transform: translateX(5px);
+            animation: hoverPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes hoverPulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(0, 212, 255, 0.1);
+                border-color: rgba(0, 212, 255, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 212, 255, 0.6), inset 0 0 30px rgba(0, 212, 255, 0.2);
+                border-color: rgba(0, 212, 255, 1);
+            }
+        }
+
+        .btn-icon {
+            width: 24px;
+            height: 24px;
+            color: #00d4ff;
+            filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.5));
+            flex-shrink: 0;
+        }
+
+        .btn-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        .btn-label {
+            color: #ffffff;
             font-weight: 500;
-            letter-spacing: 0.5px;
+            font-size: 0.95rem;
+            display: block;
+            margin-bottom: 0.25rem;
         }
 
-        .link-card:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .btn-sublabel {
+            color: #64748b;
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
         }
 
+        .btn-arrow {
+            color: #00d4ff;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .sonar-btn:hover .btn-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Ripple Effect on Click */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.4);
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Footer */
         .footer {
-            margin-top: 30px;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
+            margin-top: 3rem;
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .footer-text {
+            color: #334155;
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 2px;
+        }
+
+        .sonar-brand {
+            color: #00d4ff;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scanline Effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.03;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+        }
+
+        /* Glitch Effect for Title */
+        .glitch {
+            position: relative;
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            96% { transform: translate(-1px, 1px); }
+            98% { transform: translate(1px, -1px); }
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 480px) {
+            .profile-img {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .username {
+                font-size: 1.25rem;
+            }
+            
+            .links-container {
+                max-width: 100%;
+            }
+            
+            .sonar-btn {
+                padding: 1rem 1.25rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1e3a5f;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00d4ff;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <img src="image_22d600.jpg" alt="Profile" class="profile-pic">
-        
-        <h1>Forest Luminosity</h1>
-
-        <div class="links-container">
-            <a href="#" class="link-card">🌿 VSCO PHOTOGRAPHY</a>
-            <a href="#" class="link-card">📖 SUBSTACK</a>
-            <a href="#" class="link-card">🏎️ 2011 Toyota Corolla CE </a>
-        </div>
-
-        <div class="footer">
-            Built with Nature in Mind
-        </div>
+    <!-- Background Effects -->
+    <div class="sonar-grid">
+        <div class="sonar-ring"></div>
+        <div class="sonar-ring"></div>
+        <div class="sonar-ring"></div>
+        <div class="sonar-ring"></div>
+        <div class="sonar-ring"></div>
+        <div class="crosshair-h"></div>
+        <div class="crosshair-v"></div>
     </div>
 
+    <div class="radar-sweep">
+        <div class="sweep-line"></div>
+    </div>
+
+    <div class="pulse-container" id="pulseContainer">
+        <!-- Dynamic pulses will be generated here -->
+    </div>
+
+    <div class="scanlines"></div>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <div class="avatar-container">
+                <div class="avatar-glow"></div>
+                <div class="avatar-ring"></div>
+                <img src="http://static.photos/technology/320x240/42" alt="Profile" class="profile-img">
+            </div>
+            <h1 class="username glitch">COMMANDER_X</h1>
+            <p class="handle">@deep_sea_ops</p>
+            
+            <div class="status-bar">
+                <span class="status-dot"></span>
+                <span>SYSTEM ONLINE • DEPTH: 2,400m</span>
+            </div>
+        </div>
+
+        <!-- Links Container -->
+        <div class="links-container">
+            
+            <a href="#" class="sonar-btn" onclick="createRipple(event, this)">
+                <i data-lucide="radio" class="btn-icon"></i>
+                <div class="btn-text">
+                    <span class="btn-label">Active Sonar Array</span>
+                    <span class="btn-sublabel">FREQ: 24kHz • RANGE: 5000m</span>
+                </div>
+                <i data-lucide="chevron-right" class="btn-arrow" style="width: 20px; height: 20px;"></i>
+            </a>
+
+            <a href="#" class="sonar-btn" onclick="createRipple(event, this)">
+                <i data-lucide="github" class="btn-icon"></i>
+                <div class="btn-text">
+                    <span class="btn-label">Navigation Charts</span>
+                    <span class="btn-sublabel">GITHUB REPOSITORY // PUBLIC</span>
+                </div>
+                <i data-lucide="chevron-right" class="btn-arrow" style="width: 20px; height: 20px;"></i>
+            </a>
+
+            <a href="#" class="sonar-btn" onclick="createRipple(event, this)">
+                <i data-lucide="twitter" class="btn-icon"></i>
+                <div class="btn-text">
+                    <span class="btn-label">Surface Communications</span>
+                    <span class="btn-sublabel">TWITTER / X FEED</span>
+                </div>
+                <i data-lucide="chevron-right" class="btn-arrow" style="width: 20px; height: 20px;"></i>
+            </a>
+
+            <a href="#" class="sonar-btn" onclick="createRipple(event, this)">
+                <i data-lucide="youtube" class="btn-icon"></i>
+                <div class="btn-text">
+                    <span class="btn-label">Deep Dive Archives</span>
+                    <span class="btn-sublabel">YOUTUBE CHANNEL</span>
+                </div>
+                <i data-lucide="chevron-right" class="btn-arrow" style="width: 20px; height: 20px;"></i>
+            </a>
+
+            <a href="#" class="sonar-btn" onclick="createRipple(event, this)">
+                <i data-lucide="mail" class="btn-icon"></i>
+                <div class="btn-text">
+                    <span class="btn-label">Secure Channel</span>
+                    <span class="btn-sublabel">CONTACT // ENCRYPTED</span>
+                </div>
+                <i data-lucide="chevron-right" class="btn-arrow" style="width: 20px; height: 20px;"></i>
+            </a>
+
+            <a href="#" class="sonar-btn" onclick="createRipple(event, this)">
+                <i data-lucide="file-text" class="btn-icon"></i>
+                <div class="btn-text">
+                    <span class="btn-label">Mission Parameters</span>
+                    <span class="btn-sublabel">RESUME / CV // PDF</span>
+                </div>
+                <i data-lucide="chevron-right" class="btn-arrow" style="width: 20px; height: 20px;"></i>
+            </a>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">
+                DETECTED BY <span class="sonar-brand">SONAR_LINK v2.4</span>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Ripple Effect Function
+        function createRipple(event, element) {
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            
+            const rect = element.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            
+            element.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        }
+
+        // Interactive Pulse System
+        const pulseContainer = document.getElementById('pulseContainer');
+        const pulseTypes = ['type-1', 'type-2', 'type-3', 'type-4', 'type-5'];
+        const pulseAnimations = ['pulse-active-1', 'pulse-active-2', 'pulse-active-3', 'pulse-active-4', 'pulse-active-5'];
+        let pulseQueue = [];
+        let isProcessingQueue = false;
+
+        function createReactivePulse(x, y) {
+            // Create 1-3 pulses of different types
+            const numPulses = Math.floor(Math.random() * 2) + 1;
+            
+            for (let i = 0; i < numPulses; i++) {
+                setTimeout(() => {
+                    const pulse = document.createElement('div');
+                    const typeIndex = Math.floor(Math.random() * pulseTypes.length);
+                    const animIndex = Math.floor(Math.random() * pulseAnimations.length);
+                    
+                    pulse.className = `pulse-ring ${pulseTypes[typeIndex]} ${pulseAnimations[animIndex]}`;
+                    
+                    // Position near the hovered element but with some randomness
+                    const offsetX = (Math.random() - 0.5) * 200;
+                    const offsetY = (Math.random() - 0.5) * 100;
+                    
+                    pulse.style.left = `calc(50% + ${offsetX}px)`;
+                    pulse.style.top = `calc(50% + ${offsetY}px)`;
+                    
+                    // Random size variation
+                    const scale = 0.8 + Math.random() * 0.4;
+                    pulse.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                    
+                    pulseContainer.appendChild(pulse);
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        pulse.remove();
+                    }, 1500);
+                }, i * 100);
+            }
+        }
+
+        // Add hover listeners to all sonar buttons
+        document.querySelectorAll('.sonar-btn').forEach((btn, index) => {
+            btn.addEventListener('mouseenter', (e) => {
+                // Create pulse at button position
+                const rect = btn.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                
+                createReactivePulse(x, y);
+                
+                // Occasional secondary burst for dramatic effect
+                if (Math.random() > 0.6) {
+                    setTimeout(() => createReactivePulse(x, y), 200);
+                }
+            });
+            
+            // Also trigger on focus for accessibility
+            btn.addEventListener('focus', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                createReactivePulse(x, y);
+            });
+        });
+
+        // Create ambient pulses occasionally when not hovering
+        function ambientPulse() {
+            const shouldTrigger = Math.random() > 0.7;
+            if (shouldTrigger && pulseContainer.children.length < 3) {
+                const pulse = document.createElement('div');
+                const typeIndex = Math.floor(Math.random() * pulseTypes.length);
+                
+                pulse.className = `pulse-ring ${pulseTypes[typeIndex]} pulse-active-1`;
+                
+                // Random position
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 100 + Math.random() * 200;
+                const offsetX = Math.cos(angle) * distance;
+                const offsetY = Math.sin(angle) * distance;
+                
+                pulse.style.left = `calc(50% + ${offsetX}px)`;
+                pulse.style.top = `calc(50% + ${offsetY}px)`;
+                pulse.style.opacity = '0.3';
+                
+                pulseContainer.appendChild(pulse);
+                
+                setTimeout(() => {
+                    pulse.remove();
+                }, 1200);
+            }
+            
+            setTimeout(ambientPulse, 2000 + Math.random() * 3000);
+        }
+
+        // Start ambient pulses
+        ambientPulse();
+
+        // Parallax Effect on Mouse Move
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX * 2) / 100;
+            const y = (window.innerHeight - e.pageY * 2) / 100;
+            
+            const grid = document.querySelector('.sonar-grid');
+            const sweep = document.querySelector('.radar-sweep');
+            
+            grid.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+            sweep.style.transform = `translate(calc(-50% + ${x * 0.5}px), calc(-50% + ${y * 0.5}px))`;
+        });
+
+        // Add depth counter animation
+        let depth = 2400;
+        setInterval(() => {
+            depth += Math.floor(Math.random() * 3) - 1;
+            const statusText = document.querySelector('.status-bar span:last-child');
+            if (statusText) {
+                statusText.textContent = `SYSTEM ONLINE • DEPTH: ${depth}m`;
+            }
+        }, 2000);
+
+        // Glitch effect randomizer
+        setInterval(() => {
+            const glitch = document.querySelector('.glitch');
+            if (Math.random() > 0.95) {
+                glitch.style.textShadow = `
+                    ${Math.random() * 4 - 2}px 0 #ff0000,
+                    ${Math.random() * 4 - 2}px 0 #00ffff
+                `;
+                setTimeout(() => {
+                    glitch.style.textShadow = '0 0 10px rgba(0, 212, 255, 0.5)';
+                }, 100);
+            }
+        }, 3000);
+    </script>
 </body>
 </html>
